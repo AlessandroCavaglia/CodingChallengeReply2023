@@ -1,5 +1,5 @@
-1 1 L L L L L L
-
-
+1 0 L U U U U U
+3 0 R D D R U U U
+5 5 D R D R R
 
 

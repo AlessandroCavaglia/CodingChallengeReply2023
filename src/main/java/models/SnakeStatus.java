@@ -24,7 +24,8 @@ public class SnakeStatus {
     public void setOriginPosition(int originalRow, int originalColumn){
         this.originalRow=originalRow;
         this.originalColumn=originalColumn;
-
-        movements+=originalRow+" "+originalColumn;
+        this.actualRow=originalRow;
+        this.actualColumn=originalColumn;
+        movements=originalRow+" "+originalColumn;
     }
 }

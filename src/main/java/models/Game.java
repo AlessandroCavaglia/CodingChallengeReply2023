@@ -8,6 +8,7 @@ public class Game {
     public List<Short> snakes=new ArrayList<Short>();
     public Cell[][] map=null;
 
+    public boolean kmeansOver=false;
     public List<SnakeStatus> snakeStatuses=new ArrayList<>();
 
 }

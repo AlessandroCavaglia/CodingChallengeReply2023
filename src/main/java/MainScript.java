@@ -1,34 +1,29 @@
 import models.Cell;
 import models.Game;
+import models.SnakeStatus;
 import utils.InputReader;
+import utils.Kmeans;
 import utils.OutputWriter;
 
 public class MainScript {
 
-    public static void main(String[] args) {
-        /**
-         * example field
-         */
-        Cell[][] map = new Cell[5000][5000];
-        for(int i=0; i < 5000; i++) {
-            for(int j=0; j < 5000; j++) {
-                map[i][j] = new Cell((short) 0,(short) 0);
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Game game=InputReader.read("00-example.txt");
+        game= Kmeans.runKmeans(game);
+        System.out.println("HO FATTO IL KMEANS!!!!!!!!!!");
+        for(int i =0;i<game.snakeNumber;i++){
+            System.out.println("Elaboro il serpente "+i);
+            while(game.snakes.get(i)>0){
+                char bestMove=bestMove(game.map,(short)game.snakeStatuses.get(i).actualRow,(short)game.snakeStatuses.get(i).actualColumn,game);
+                int[] newPos=nextPos(game.snakeStatuses.get(i),bestMove,game);
+                game.snakeStatuses.get(i).addMove(""+bestMove,newPos[0],newPos[1]);
+                game.map[newPos[0]][newPos[1]].setSnakeId((short)i);
+                game.snakes.set(i, (short) (game.snakes.get(i)-1));
             }
         }
-        map[0][1].setSnakeId((short) 5);
-        map[0][1].setScore((short) 5);
-        map[0][2].setSnakeId((short) 5);
-        map[0][2].setScore((short) 5);
-        map[0][3].setSnakeId((short) 5);
-        map[0][3].setScore((short) 5);
 
-        System.out.println("Hello world");
-        System.out.println(score(map, 3, 3));
-
-        Game game=InputReader.read("00-example.txt");
-        game.snakeStatuses.get(0).setOriginPosition(0,0);
-        game.snakeStatuses.get(0).addMove("D",1,0);
         OutputWriter.write("00-example-solution.txt",game);
+        System.out.println(score(game.map, game.columns, game.rows));
     }
 
     /**
@@ -60,34 +55,34 @@ public class MainScript {
     public static char bestMove(Cell[][] map, short r, short c, Game game) {
         short moves[] = new short[4];
 
-        if (map[r+1 % game.rows][c].getScore() > 0
-                && map[r+1 % game.rows][c].getSnakeId() >= 0
+        if (map[floorMod(r+1,game.rows)][c].getScore() >= -10000
+                && map[floorMod(r+1,game.rows)][c].getSnakeId() < 0
         ) {
-            moves[0] = map[r+1 % game.rows][c].getScore();
+            moves[0] = map[floorMod(r+1,game.rows)][c].getScore();
         } else {
             moves[0] = -10000;
         }
 
-        if (map[r][c+1 % game.columns].getScore() > 0
-                && map[r][c+1 % game.columns].getSnakeId() >= 0
+        if (map[r][floorMod(c+1,game.columns)].getScore() >= -10000
+                && map[r][floorMod(c+1,game.columns)].getSnakeId() < 0
         ) {
-            moves[1] = map[r][c+1 % game.columns].getScore();
+            moves[1] = map[r][floorMod(c+1,game.columns)].getScore();
         } else {
             moves[1] = -10000;
         }
 
-        if (map[r-1 % game.rows][c].getScore() > 0
-                && map[r-1 % game.rows][c].getSnakeId() >= 0
+        if (map[floorMod(r-1,game.rows)][c].getScore() >= -10000
+                && map[floorMod(r-1,game.rows)][c].getSnakeId() < 0
         ) {
-            moves[2] = map[r-1 % game.rows][c].getScore();
+            moves[2] = map[floorMod(r-1,game.rows)][c].getScore();
         } else {
             moves[2] = -10000;
         }
 
-        if (map[r][c-1 % game.columns].getScore() > 0
-                && map[r][c-1 % game.columns].getSnakeId() >= 0
+        if (map[r][floorMod(c-1,game.columns)].getScore() >= -10000
+                && map[r][floorMod(c-1,game.columns)].getSnakeId() < 0
         ) {
-            moves[3] = map[r][c-1 % game.columns].getScore();
+            moves[3] = map[r][floorMod(c-1,game.columns)].getScore();
         } else {
             moves[3] = -10000;
         }
@@ -97,12 +92,12 @@ public class MainScript {
             case 1:
                 return 'R';
             case 2:
-                return 'D';
+                return 'U';
             case 3:
                 return 'L';
             case 0:
             default:
-                return 'U';
+                return 'D';
         }
     }
 
@@ -119,5 +114,31 @@ public class MainScript {
         return index;
     }
 
+    public static int[] nextPos(SnakeStatus s,char move,Game g){
+        int[] result=new int[2];
+        switch (move) {
+            case 'R':
+                result[0]=s.actualRow;
+                result[1]=floorMod(s.actualColumn+1,g.columns);
+                break;
+            case 'D':
+                result[0]=floorMod(s.actualRow+1,g.rows);
+                result[1]=s.actualColumn;
+                break;
+            case 'L':
+                result[0]=s.actualRow;
+                result[1]=floorMod(s.actualColumn-1,g.columns);
+                break;
+            case 'U':
+                result[0]=floorMod(s.actualRow-1,g.rows);
+                result[1]=s.actualColumn;
+                break;
+
+        }
+        return result;
+    }
+    private static int floorMod(int val, int mod){
+        return (((val % mod) + mod) % mod);
+    }
 
 }
