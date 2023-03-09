@@ -27,7 +27,7 @@ public class MainScript {
 
         Game game=InputReader.read("00-example.txt");
         game.snakeStatuses.get(0).setOriginPosition(0,0);
-        game.snakeStatuses.get(0).addMove("D");
+        game.snakeStatuses.get(0).addMove("D",1,0);
         OutputWriter.write("00-example-solution.txt",game);
     }
 
