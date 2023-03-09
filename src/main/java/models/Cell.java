@@ -9,6 +9,11 @@ public class Cell {
         this.snakeId = snakeId;
     }
 
+    public Cell(short score) {
+        this.score = score;
+        this.snakeId = -1;
+    }
+
     public short getScore() {
         return score;
     }
